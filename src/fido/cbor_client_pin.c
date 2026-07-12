@@ -279,25 +279,18 @@ static int __attribute__((unused)) getPublicKey(void) {
     return 0;
 }
 
-static int __attribute__((unused)) pinUvAuthTokenUsageTimerObserver(void) {
+void pin_uv_auth_token_tick(void) {
+    uint32_t now = board_millis();
     if (usage_timer == 0) {
-        return -1;
+        return;
     }
-    if (usage_timer + max_usage_time_period > board_millis()) {
-        if (user_present_time_limit == 0 ||
-            user_present_time_limit + TRANSPORT_TIME_LIMIT < board_millis()) {
-            clearUserPresentFlag();
-        }
-        if (paut.in_use == true) {
-            if (initial_usage_time_limit == 0 ||
-                initial_usage_time_limit + TRANSPORT_TIME_LIMIT < board_millis()) {
-                stopUsingPinUvAuthToken();
-                return 1;
-            }
-        }
-        // TO DO: implement a rolling timer
+    if (paut.in_use == true && (usage_timer + max_usage_time_period <= now || initial_usage_time_limit == 0 || initial_usage_time_limit + TRANSPORT_TIME_LIMIT <= now)) {
+        stopUsingPinUvAuthToken();
+        return;
     }
-    return 0;
+    if (user_present_time_limit == 0 || user_present_time_limit + TRANSPORT_TIME_LIMIT <= now) {
+        clearUserPresentFlag();
+    }
 }
 
 static int check_keydev_encrypted(const uint8_t pin_token[32]) {
