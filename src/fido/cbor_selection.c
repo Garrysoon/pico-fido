@@ -27,7 +27,7 @@ int cbor_selection(void) {
     rp_id = user_name = display_name = NULL;
     /* authenticatorSelection always requires a user-presence interaction. */
     bool previous_force_button_wait = force_button_wait;
-#ifdef FORCE_WAIT_BUTTON
+#ifdef FORCE_BUTTON_WAIT
     force_button_wait = true;
 #endif
     int ret = wait_button_pressed();

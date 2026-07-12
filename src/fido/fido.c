@@ -16,6 +16,7 @@
  */
 
 #include "picokeys.h"
+#include "button.h"
 #include "fido.h"
 #include "serial.h"
 #include "apdu.h"
@@ -532,7 +533,13 @@ uint32_t user_present_time_limit = 0;
 
 bool check_user_presence(void) {
     if (user_present_time_limit == 0 || user_present_time_limit + TRANSPORT_TIME_LIMIT < board_millis()) {
-        if (wait_button_pressed() > 0) { //timeout
+        bool previous_force_button_wait = force_button_wait;
+#ifdef FORCE_BUTTON_WAIT
+        force_button_wait = true;
+#endif
+        int ret = wait_button_pressed();
+        force_button_wait = previous_force_button_wait;
+        if (ret > 0) {
             return false;
         }
         //user_present_time_limit = board_millis();
