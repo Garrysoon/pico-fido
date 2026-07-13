@@ -18,6 +18,7 @@
 """
 
 
+import os
 import pytest
 from fido2.ctap2.extensions import CredProtectExtension
 from fido2.webauthn import UserVerificationRequirement
@@ -105,6 +106,44 @@ def test_setminpin_too_many_rpids(device):
     with pytest.raises(CtapError) as e:
         cfg.set_min_pin_length(MINPINLENGTH,rp_ids=rp_ids)
     assert e.value.code == CtapError.ERR.KEY_STORE_FULL
+
+
+def test_toggle_always_uv_config_subcommand(device):
+    device.reset()
+    ClientPin(device.client()._backend.ctap2).set_pin(PIN)
+    cfg = FidoConfig(device)
+    ctap = device.client()._backend.ctap2
+    before = ctap.get_info().options["alwaysUv"]
+
+    cfg.toggle_always_uv()
+
+    assert ctap.get_info().options["alwaysUv"] is not before
+
+
+def test_pin_complexity_policy_extension(device):
+    device.reset()
+    ClientPin(device.client()._backend.ctap2).set_pin(PIN)
+    cfg = FidoConfig(device)
+    cfg.set_min_pin_length(
+        MINPINLENGTH,
+        rp_ids=["example.com"],
+        pin_complexity_policy=True,
+    )
+
+    assert device.client()._backend.ctap2.get_info().pin_complexity_policy is True
+    client_data_hash = os.urandom(32)
+    pin_token = ClientPin(device.client()._backend.ctap2).get_pin_token(
+        PIN, permissions=ClientPin.PERMISSION.MAKE_CREDENTIAL
+    )
+    protocol = PinProtocolV2()
+    response = device.MC(
+        client_data_hash=client_data_hash,
+        rp={"id": "example.com", "name": "Example RP"},
+        extensions={"pinComplexityPolicy": True},
+        pin_uv_protocol=protocol.VERSION,
+        pin_uv_param=protocol.authenticate(pin_token, client_data_hash),
+    )
+    assert response["res"].auth_data.extensions["pinComplexityPolicy"] is True
 
 def test_setminpin_check_force(device, SetMinPin, MCMinPin):
     cfg = FidoConfig(device)
