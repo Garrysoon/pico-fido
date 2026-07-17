@@ -112,6 +112,7 @@ endif()
 
 list(APPEND SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/src/fido/fido.c
+    ${CMAKE_CURRENT_LIST_DIR}/src/fido/object_authorization.c
     ${CMAKE_CURRENT_LIST_DIR}/src/fido/object_provider.c
     ${CMAKE_CURRENT_LIST_DIR}/src/fido/files.c
     ${CMAKE_CURRENT_LIST_DIR}/src/fido/cmd_register.c
@@ -226,6 +227,19 @@ if(NOT ESP_PLATFORM)
         endif()
         target_link_libraries(fido_object_provider_test PRIVATE mbedtls)
         add_test(NAME fido_object_provider_test COMMAND fido_object_provider_test)
+
+        add_executable(fido_object_authorization_test
+            ${CMAKE_CURRENT_LIST_DIR}/src/fido/object_authorization.c
+            ${CMAKE_CURRENT_LIST_DIR}/tests/fido_object_authorization_test.c
+        )
+        target_include_directories(fido_object_authorization_test PRIVATE ${INCLUDES})
+        if(MSVC)
+            target_compile_options(fido_object_authorization_test PRIVATE /W4 /WX)
+        else()
+            target_compile_options(fido_object_authorization_test PRIVATE -Wall -Wextra -Werror)
+        endif()
+        target_link_libraries(fido_object_authorization_test PRIVATE mbedtls)
+        add_test(NAME fido_object_authorization_test COMMAND fido_object_authorization_test)
     else()
         target_link_libraries(
             pico_fido
