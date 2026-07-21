@@ -17,8 +17,8 @@
 
 cmake_minimum_required(VERSION 3.13)
 
-set(USB_VID 0x2E8A)
-set(USB_PID 0x10FE)
+set(USB_VID 0x1050)
+set(USB_PID 0x0407)
 
 if(ESP_PLATFORM)
     if(NOT DEFINED ENABLE_POWER_ON_RESET)
@@ -28,9 +28,10 @@ if(ESP_PLATFORM)
         set(ENABLE_PQC 0)
     endif()
     set(EXTRA_COMPONENT_DIRS
-        src/fido
         pico-keys-sdk/config/esp32/components/pico-keys-sdk
         pico-keys-sdk/config/esp32/components/tinycbor
+        pico-keys-sdk/config/esp32/components/cjson
+        src/fido
     )
     if(ENABLE_PQC)
         list(APPEND EXTRA_COMPONENT_DIRS
