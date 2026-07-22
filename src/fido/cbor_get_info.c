@@ -218,7 +218,7 @@ int cbor_get_info(void) {
     CBOR_CHECK(cbor_encode_uint(&mapEncoder, MAX_RPIDS_MINPIN_LENGTH)); // maxRPIDsForSetMinPINLength
 #ifndef ENABLE_EMULATION
     CBOR_CHECK(cbor_encode_uint(&mapEncoder, 0x15));
-    CBOR_CHECK(cbor_encoder_create_array(&mapEncoder, &arrayEncoder, 7));
+    CBOR_CHECK(cbor_encoder_create_array(&mapEncoder, &arrayEncoder, 11));
     CBOR_CHECK(cbor_encode_uint(&arrayEncoder, CTAP_CONFIG_AUT_DISABLE));
     CBOR_CHECK(cbor_encode_uint(&arrayEncoder, CTAP_CONFIG_EA_UPLOAD));
     CBOR_CHECK(cbor_encode_uint(&arrayEncoder, CTAP_CONFIG_MCUV_NOTRQD));
@@ -226,6 +226,10 @@ int cbor_get_info(void) {
     CBOR_CHECK(cbor_encode_uint(&arrayEncoder, CTAP_CONFIG_NORK));
     CBOR_CHECK(cbor_encode_uint(&arrayEncoder, CTAP_CONFIG_PIN_POLICY));
     CBOR_CHECK(cbor_encode_uint(&arrayEncoder, CTAP_CONFIG_PHY_VIDPID));
+    CBOR_CHECK(cbor_encode_uint(&arrayEncoder, CTAP_CONFIG_PHY_LED_BRIGHTNESS));
+    CBOR_CHECK(cbor_encode_uint(&arrayEncoder, CTAP_CONFIG_PHY_LED_DRIVER));
+    CBOR_CHECK(cbor_encode_uint(&arrayEncoder, CTAP_CONFIG_PHY_LED_ORDER));
+    CBOR_CHECK(cbor_encode_uint(&arrayEncoder, CTAP_CONFIG_PHY_LED_GPIO));
     CBOR_CHECK(cbor_encoder_close_container(&mapEncoder, &arrayEncoder));
 #endif
 

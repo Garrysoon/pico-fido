@@ -232,6 +232,46 @@ int cbor_config(const uint8_t *data, size_t len) {
                 CBOR_ERROR(CTAP2_ERR_PROCESSING);
             }
         }
+        else if (vendorCommandId == CTAP_CONFIG_PHY_LED_BRIGHTNESS) {
+            if (vendorParamInt > 15) {
+                CBOR_ERROR(CTAP1_ERR_INVALID_PARAMETER);
+            }
+            phy_data.led_brightness = (uint8_t)vendorParamInt;
+            phy_data.led_brightness_present = true;
+            if (phy_save() != PICOKEYS_OK) {
+                CBOR_ERROR(CTAP2_ERR_PROCESSING);
+            }
+        }
+        else if (vendorCommandId == CTAP_CONFIG_PHY_LED_DRIVER) {
+            if (vendorParamInt > 5 && vendorParamInt != 0xFF) {
+                CBOR_ERROR(CTAP1_ERR_INVALID_PARAMETER);
+            }
+            phy_data.led_driver = (uint8_t)vendorParamInt;
+            phy_data.led_driver_present = true;
+            if (phy_save() != PICOKEYS_OK) {
+                CBOR_ERROR(CTAP2_ERR_PROCESSING);
+            }
+        }
+        else if (vendorCommandId == CTAP_CONFIG_PHY_LED_ORDER) {
+            if (vendorParamInt > 5) {
+                CBOR_ERROR(CTAP1_ERR_INVALID_PARAMETER);
+            }
+            phy_data.led_order = (uint8_t)vendorParamInt;
+            phy_data.led_order_present = true;
+            if (phy_save() != PICOKEYS_OK) {
+                CBOR_ERROR(CTAP2_ERR_PROCESSING);
+            }
+        }
+        else if (vendorCommandId == CTAP_CONFIG_PHY_LED_GPIO) {
+            if (vendorParamInt > 255) {
+                CBOR_ERROR(CTAP1_ERR_INVALID_PARAMETER);
+            }
+            phy_data.led_gpio = (uint8_t)vendorParamInt;
+            phy_data.led_gpio_present = true;
+            if (phy_save() != PICOKEYS_OK) {
+                CBOR_ERROR(CTAP2_ERR_PROCESSING);
+            }
+        }
         else {
             CBOR_ERROR(CTAP2_ERR_INVALID_SUBCOMMAND);
         }
