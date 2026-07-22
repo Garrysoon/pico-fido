@@ -26,6 +26,7 @@
 #include "files.h"
 #include "crypto_utils.h"
 #include "apdu.h"
+#include "button.h"
 #include "cbor_make_credential.h"
 #include "credential.h"
 #include "mbedtls/sha256.h"
@@ -460,9 +461,12 @@ int cbor_get_assertion(const uint8_t *data, size_t len, bool next) {
         if (options.up == ptrue || options.present == false || options.up == NULL) { //9.1
             if (pinUvAuthParam.present == true) {
                 if (getUserPresentFlagValue() == false) {
+                    force_button_wait = true;
                     if (check_user_presence() == false) {
+                        force_button_wait = false;
                         CBOR_ERROR(CTAP2_ERR_OPERATION_DENIED);
                     }
+                    force_button_wait = false;
 #ifndef ENABLE_EMULATION
                     button_pressed = phy_data.up_btn != 0;
 #endif
@@ -470,9 +474,12 @@ int cbor_get_assertion(const uint8_t *data, size_t len, bool next) {
             }
             else {
                 if (!(flags & FIDO2_AUT_FLAG_UP)) {
+                    force_button_wait = true;
                     if (check_user_presence() == false) {
+                        force_button_wait = false;
                         CBOR_ERROR(CTAP2_ERR_OPERATION_DENIED);
                     }
+                    force_button_wait = false;
 #ifndef ENABLE_EMULATION
                     button_pressed = phy_data.up_btn != 0;
 #endif

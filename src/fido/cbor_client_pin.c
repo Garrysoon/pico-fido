@@ -501,7 +501,7 @@ int cbor_client_pin(const uint8_t *data, size_t len) {
             pin_byte_len++;
         }
         uint16_t pin_codepoints = pin_codepoint_len(paddedNewPin, pin_byte_len);
-        uint8_t minPin = 4;
+        uint8_t minPin = 1;
         file_t *ef_minpin = file_search_by_fid(EF_MINPINLEN, NULL, SPECIFY_EF);
         if (file_has_data(ef_minpin)) {
             minPin = *file_get_data(ef_minpin);
@@ -661,7 +661,7 @@ int cbor_client_pin(const uint8_t *data, size_t len) {
             pin_byte_len++;
         }
         uint16_t pin_codepoints = pin_codepoint_len(paddedNewPin, pin_byte_len);
-        uint8_t minPin = 4;
+        uint8_t minPin = 1;
         file_t *ef_minpin = file_search_by_fid(EF_MINPINLEN, NULL, SPECIFY_EF);
         if (file_has_data(ef_minpin)) {
             minPin = *file_get_data(ef_minpin);
@@ -735,12 +735,6 @@ int cbor_client_pin(const uint8_t *data, size_t len) {
                 CBOR_ERROR(CTAP2_ERR_UNAUTHORIZED_PERMISSION);
             }
         }
-        if (!file_has_data(ef_pin)) {
-            CBOR_ERROR(CTAP2_ERR_PIN_NOT_SET);
-        }
-        if (*file_get_data(ef_pin) == 0) {
-            CBOR_ERROR(CTAP2_ERR_PIN_BLOCKED);
-        }
         if (mbedtls_mpi_read_binary(&hkey.ctx.mbed_ecdh.Qp.X, kax.data, kax.len) != 0) {
             CBOR_ERROR(CTAP1_ERR_INVALID_PARAMETER);
         }
@@ -755,6 +749,12 @@ int cbor_client_pin(const uint8_t *data, size_t len) {
         if (ret != 0) {
             mbedtls_platform_zeroize(sharedSecret, sizeof(sharedSecret));
             CBOR_ERROR(CTAP1_ERR_INVALID_PARAMETER);
+        }
+        if (!file_has_data(ef_pin)) {
+            CBOR_ERROR(CTAP2_ERR_PIN_NOT_SET);
+        }
+        if (*file_get_data(ef_pin) == 0) {
+            CBOR_ERROR(CTAP2_ERR_PIN_BLOCKED);
         }
         uint8_t pin_data[PIN_DATA_LEN];
         uint16_t pin_data_len = 0;

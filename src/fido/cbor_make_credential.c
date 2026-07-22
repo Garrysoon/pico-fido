@@ -23,6 +23,7 @@
 #include "ctap.h"
 #include "files.h"
 #include "apdu.h"
+#include "button.h"
 #include "credential.h"
 #include "mbedtls/sha256.h"
 #include "random.h"
@@ -464,16 +465,15 @@ int cbor_make_credential(const uint8_t *data, size_t len) {
     }
 
     if (options.up == ptrue || options.up == NULL) { //14.1
-        if (pinUvAuthParam.present == true) {
-            if (getUserPresentFlagValue() == false) {
-                if (check_user_presence() == false) {
-                    CBOR_ERROR(CTAP2_ERR_OPERATION_DENIED);
-                }
-#ifndef ENABLE_EMULATION
-                button_pressed = phy_data.up_btn != 0;
-#endif
-            }
+        force_button_wait = true;
+        if (check_user_presence() == false) {
+            force_button_wait = false;
+            CBOR_ERROR(CTAP2_ERR_OPERATION_DENIED);
         }
+        force_button_wait = false;
+#ifndef ENABLE_EMULATION
+        button_pressed = phy_data.up_btn != 0;
+#endif
         flags |= FIDO2_AUT_FLAG_UP;
         if (options.up == ptrue) {
             clearUserPresentFlag();

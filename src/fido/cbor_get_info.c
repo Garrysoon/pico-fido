@@ -79,10 +79,6 @@ int cbor_get_info(void) {
     file_t *ef_ee_ea = file_search_by_fid(EF_EE_DEV_EA, NULL, SPECIFY_EF);
     bool enterprise_profile = ((get_opts() & FIDO2_OPT_EA) && file_has_data(ef_ee_ea));
 #ifndef ENABLE_EMULATION
-    if (phy_data.vid != 0x1050) {
-        lfields++;
-    }
-#else
     lfields++;
 #endif
     file_t *ef_pin_policy = file_search_by_fid(EF_PIN_COMPLEXITY_POLICY, NULL, SPECIFY_EF);
@@ -209,7 +205,7 @@ int cbor_get_info(void) {
         CBOR_CHECK(cbor_encode_uint(&mapEncoder, *file_get_data(ef_minpin))); // minPINLength
     }
     else {
-        CBOR_CHECK(cbor_encode_uint(&mapEncoder, 4)); // minPINLength
+        CBOR_CHECK(cbor_encode_uint(&mapEncoder, 1)); // minPINLength
 
     }
     CBOR_CHECK(cbor_encode_uint(&mapEncoder, 0x0E));
@@ -221,19 +217,16 @@ int cbor_get_info(void) {
     CBOR_CHECK(cbor_encode_uint(&mapEncoder, 0x10));
     CBOR_CHECK(cbor_encode_uint(&mapEncoder, MAX_RPIDS_MINPIN_LENGTH)); // maxRPIDsForSetMinPINLength
 #ifndef ENABLE_EMULATION
-    if (phy_data.vid != 0x1050) {
-#endif
-        CBOR_CHECK(cbor_encode_uint(&mapEncoder, 0x15));
-        CBOR_CHECK(cbor_encoder_create_array(&mapEncoder, &arrayEncoder, 6));
-        CBOR_CHECK(cbor_encode_uint(&arrayEncoder, CTAP_CONFIG_AUT_DISABLE));
-        CBOR_CHECK(cbor_encode_uint(&arrayEncoder, CTAP_CONFIG_EA_UPLOAD));
-        CBOR_CHECK(cbor_encode_uint(&arrayEncoder, CTAP_CONFIG_MCUV_NOTRQD));
-        CBOR_CHECK(cbor_encode_uint(&arrayEncoder, CTAP_CONFIG_AUT_ENABLE));
-        CBOR_CHECK(cbor_encode_uint(&arrayEncoder, CTAP_CONFIG_NORK));
-        CBOR_CHECK(cbor_encode_uint(&arrayEncoder, CTAP_CONFIG_PIN_POLICY));
-        CBOR_CHECK(cbor_encoder_close_container(&mapEncoder, &arrayEncoder));
-#ifndef ENABLE_EMULATION
-    }
+    CBOR_CHECK(cbor_encode_uint(&mapEncoder, 0x15));
+    CBOR_CHECK(cbor_encoder_create_array(&mapEncoder, &arrayEncoder, 7));
+    CBOR_CHECK(cbor_encode_uint(&arrayEncoder, CTAP_CONFIG_AUT_DISABLE));
+    CBOR_CHECK(cbor_encode_uint(&arrayEncoder, CTAP_CONFIG_EA_UPLOAD));
+    CBOR_CHECK(cbor_encode_uint(&arrayEncoder, CTAP_CONFIG_MCUV_NOTRQD));
+    CBOR_CHECK(cbor_encode_uint(&arrayEncoder, CTAP_CONFIG_AUT_ENABLE));
+    CBOR_CHECK(cbor_encode_uint(&arrayEncoder, CTAP_CONFIG_NORK));
+    CBOR_CHECK(cbor_encode_uint(&arrayEncoder, CTAP_CONFIG_PIN_POLICY));
+    CBOR_CHECK(cbor_encode_uint(&arrayEncoder, CTAP_CONFIG_PHY_VIDPID));
+    CBOR_CHECK(cbor_encoder_close_container(&mapEncoder, &arrayEncoder));
 #endif
 
     file_t *ef_dev_state = file_search_by_fid(EF_DEV_STATE, NULL, SPECIFY_EF);

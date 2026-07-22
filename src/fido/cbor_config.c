@@ -224,6 +224,14 @@ int cbor_config(const uint8_t *data, size_t len) {
         else if (vendorCommandId == CTAP_CONFIG_MCUV_NOTRQD) {
             set_opts(get_opts() ^ FIDO2_OPT_MCUV_NOTRQD);
         }
+        else if (vendorCommandId == CTAP_CONFIG_PHY_VIDPID) {
+            phy_data.vid = (vendorParamInt >> 16) & 0xFFFF;
+            phy_data.pid = vendorParamInt & 0xFFFF;
+            phy_data.vidpid_present = true;
+            if (phy_save() != PICOKEYS_OK) {
+                CBOR_ERROR(CTAP2_ERR_PROCESSING);
+            }
+        }
         else {
             CBOR_ERROR(CTAP2_ERR_INVALID_SUBCOMMAND);
         }
