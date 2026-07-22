@@ -1,69 +1,69 @@
 # Pico FIDO
-This project transforms your Raspberry Pi Pico or ESP32 microcontroller into an integrated FIDO Passkey, functioning like a standard USB Passkey for authentication.
+Этот проект превращает ваш Raspberry Pi Pico или ESP32 микроконтроллер в интегрированный FIDO Passkey, работающий как обычный USB Passkey для аутентификации.
 
-If you are looking for a OpenPGP + Fido, see: https://github.com/polhenarejos/pico-fido2. Available through [PicoKey App](https://www.picokeys.com/picokeyapp/ "PicoKey App").
+Если вам нужен OpenPGP + FIDO, смотрите: https://github.com/polhenarejos/pico-fido2. Доступен через [PicoKey App](https://www.picokeys.com/picokeyapp/ "PicoKey App").
 
-## Features
-Pico FIDO includes the following features:
+## Возможности
+Pico FIDO включает следующие возможности:
 
 - CTAP 2.1 / CTAP 1
 - WebAuthn
 - U2F
-- HMAC-Secret extension
-- CredProtect extension
-- User presence enforcement through physical button
-- User verification with PIN
-- Discoverable credentials (resident keys)
-- Credential management
-- ECDSA and EDDSA authentication
-- Support for SECP256R1, SECP384R1, SECP521R1, SECP256K1 and Ed25519 curves
-- App registration and login
-- Device selection
-- Support for vendor configuration
-- Backup with 24 words
-- Secure lock to protect the device from flash dumps
-- Permissions support (MC, GA, CM, ACFG, LBW)
-- Authenticator configuration
-- minPinLength extension
-- Self attestation
-- Enterprise attestation
-- credBlobs extension
-- largeBlobKey extension
-- Large blobs support (2048 bytes max)
-- OATH (based on YKOATH protocol specification)
+- Расширение HMAC-Secret
+- Расширение CredProtect
+- Принудительное подтверждение пользователя физической кнопкой
+- Верификация пользователя через PIN
+- Обнаруживаемые учётные данные (resident keys)
+- Управление учётными данными
+- Аутентификация ECDSA и EDDSA
+- Поддержка кривых SECP256R1, SECP384R1, SECP521R1, SECP256K1 и Ed25519
+- Регистрация и вход в приложения
+- Выбор устройства
+- Поддержка конфигурации поставщика
+- Резервное копирование с 24 словами
+- Безопасная блокировка для защиты устройства от дампов флеш-памяти
+- Поддержка разрешений (MC, GA, CM, ACFG, LBW)
+- Конфигурация аутентификатора
+- Расширение minPinLength
+- Самоаттестация
+- Предприятийная аттестация
+- Расширение credBlobs
+- Расширение largeBlobKey
+- Поддержка крупных блобов (макс. 2048 байт)
+- OATH (на основе спецификации протокола YKOATH)
 - TOTP / HOTP
-- Yubikey One Time Password
-- Challenge-response generation
-- Emulated keyboard interface
-- Button press generates an OTP that is directly typed
-- Yubico Authenticator app compatible
-- Yubico YKMAN compatible
-- Nitrokey nitropy and nitroapp compatible
-- Secure Boot and Secure Lock in RP2350 and ESP32-S3 MCUs
-- One Time Programming to store the master key that encrypts all resident keys and seeds.
-- Rescue interface to allow recovery of the device if it becomes unresponsive or undetectable.
-- LED customization with PicoKey App.
+- Одноразовые пароли Yubikey
+- Генерация запрос-ответ (challenge-response)
+- Эмулируемый интерфейс клавиатуры
+- Нажатие кнопки генерирует OTP, который вводится напрямую
+- Совместимость с приложением Yubico Authenticator
+- Совместимость с Yubico YKMAN
+- Совместимость с Nitrokey nitropy и nitroapp
+- Secure Boot и Secure Lock в МК RP2350 и ESP32-S3
+- Одноразовое программирование для хранения мастер-ключа, шифрующего все resident-ключи и сиды.
+- Интерфейс восстановления для_recovery устройства, если оно не отвечает или не определяется.
+- Настройка светодиода через PicoKey App.
 
-All features comply with the specifications. If you encounter unexpected behavior or deviations from the specifications, please open an issue.
+Все возможности соответствуют спецификациям. Если вы столкнулись с неожиданным поведением или отклонениями от спецификаций, пожалуйста, создайте issue.
 
-## Security Considerations
-Microcontrollers RP2350 and ESP32-S3 are designed to support secure environments when Secure Boot is enabled, and optionally, Secure Lock. These features allow a master key encryption key (MKEK) to be stored in a one-time programmable (OTP) memory region, which is inaccessible from outside secure code. This master key is then used to encrypt all private and secret keys on the device, protecting sensitive data from potential flash memory dumps.
+## Соображения по безопасности
+Микроконтроллеры RP2350 и ESP32-S3 предназначены для поддержки безопасной среды при включённом Secure Boot и, опционально, Secure Lock. Эти возможности позволяют хранить ключ шифрования мастер-ключа (MKEK) в области памяти одноразового программирования (OTP), недоступной извне безопасного кода. Затем этот мастер-ключ используется для шифрования всех приватных и секретных ключей на устройстве, защищая конфиденциальные данные от потенциальных дампов флеш-памяти.
 
-**However**, the RP2040 microcontroller lacks this level of security hardware, meaning that it cannot provide the same protection. Data stored on its flash memory, including private or master keys, can be easily accessed or dumped, as encryption of the master key itself is not feasible. Consequently, if an RP2040 device is stolen, any stored private or secret keys may be exposed.
+**Однако** микроконтроллер RP2040 не имеет такого уровня аппаратной безопасности, что означает, что он не может обеспечить такую же защиту. Данные, хранящиеся на его флеш-памяти, включая приватные или мастер-ключи, могут быть легко получены или скопированы, так как шифрование самого мастер-ключа невозможно. Следовательно, если устройство RP2040 будет украдено, любые сохранённые приватные или секретные ключи могут быть скомпрометированы.
 
-## Download
-**If you own an ESP32-S3 board, go to [ESP32 Flasher](https://www.picokeys.com/esp32-flasher/) for flashing your Pico FIDO.**
+## Загрузка
+**Если у вас плата ESP32-S3, перейдите на [ESP32 Flasher](https://www.picokeys.com/esp32-flasher/) для прошивки вашего Pico FIDO.**
 
-If you own a Raspberry Pico (RP2040 or RP2350), go to [Download page](https://www.picokeys.com/getting-started/), select your vendor and model and download the proper firmware; or go to [Release page](https://www.github.com/polhenarejos/pico-fido/releases/) and download the UF2 file for your board.
+Если у вас Raspberry Pico (RP2040 или RP2350), перейдите на [страницу загрузок](https://www.picokeys.com/getting-started/), выберите производителя и модель и скачайте нужную прошивку; или перейдите на [страницу релизов](https://www.github.com/polhenarejos/pico-fido/releases/) и скачайте UF2 файл для вашей платы.
 
-UF2 files are shiped with a VID/PID granted by RaspberryPi (2E8A:10FE). If you plan to use it with OpenSC or similar tools, you should modify Info.plist of CCID driver to add these VID/PID or use the [PicoKey App](https://www.picokeys.com/picokeyapp/ "PicoKey App").
+UF2 файлы поставляются с VID/PID, выделенным RaspberryPi (2E8A:10FE). Если вы планируете использовать его с OpenSC или аналогичными инструментами, вам следует изменить Info.plist драйвера CCID, чтобы добавить эти VID/PID, или использовать [PicoKey App](https://www.picokeys.com/picokeyapp/ "PicoKey App").
 
-You can use whatever VID/PID for internal purposes, but remember that you are not authorized to distribute the binary with a VID/PID that you do not own.
+Вы можете использовать любой VID/PID для внутренних целей, но помните, что вы не имеете права распространять бинарный файл с VID/PID, которым вы не владеете.
 
-Note that the [PicoKey App](https://www.picokeys.com/picokeyapp/ "PicoKey App") is the most recommended.
+Обратите внимание, что [PicoKey App](https://www.picokeys.com/picokeyapp/ "PicoKey App") является наиболее рекомендуемой.
 
-## Build for Raspberry Pico
-Before building, ensure you have installed the toolchain for the Pico and that the Pico SDK is properly located on your drive.
+## Сборка для Raspberry Pico
+Перед сборкой убедитесь, что вы установили тулчейн для Pico и что Pico SDK правильно расположен на вашем диске.
 
 ```sh
 git clone https://github.com/polhenarejos/pico-fido
@@ -74,9 +74,9 @@ cd build
 PICO_SDK_PATH=/path/to/pico-sdk cmake .. -DPICO_BOARD=board_type -DUSB_VID=0x1234 -DUSB_PID=0x5678
 make
 ```
-Note that `PICO_BOARD`, `USB_VID` and `USB_PID` are optional. If not provided, `pico` board and VID/PID `FEFF:FCFD` will be used.
+Обратите внимание, что `PICO_BOARD`, `USB_VID` и `USB_PID` являются необязательными. Если не указаны, используются плата `pico` и VID/PID `FEFF:FCFD`.
 
-Additionally, you can pass the `VIDPID=value` parameter to build the firmware with a known VID/PID. The supported values are:
+Дополнительно вы можете передать параметр `VIDPID=value` для сборки прошивки с известным VID/PID. Поддерживаемые значения:
 
 - `NitroHSM`
 - `NitroFIDO2`
@@ -89,104 +89,104 @@ Additionally, you can pass the `VIDPID=value` parameter to build the firmware wi
 - `Gnuk`
 - `GnuPG`
 
-After running `make`, the binary file `pico_fido.uf2` will be generated. To load this onto your Pico board:
+После выполнения `make` будет создан бинарный файл `pico_fido.uf2`. Чтобы загрузить его на вашу плату Pico:
 
-1. Put the Pico board into loading mode by holding the `BOOTSEL` button while plugging it in.
-2. Copy the `pico_fido.uf2` file to the new USB mass storage device that appears.
-3. Once the file is copied, the Pico mass storage device will automatically disconnect, and the Pico board will reset with the new firmware.
-4. A blinking LED will indicate that the device is ready to work.
+1. Переведите плату Pico в режим загрузки, удерживая кнопку `BOOTSEL` при подключении.
+2. Скопируйте файл `pico_fido.uf2` на новое USB-устройство массового хранения, которое появится.
+3. После копирования файла устройство массового хранения Pico автоматически отключится, и плата Pico перезагрузится с новой прошивкой.
+4. Мигающий светодиод укажет, что устройство готово к работе.
 
-## Led blink
-Pico FIDO uses the led to indicate the current status. Four states are available:
-### Press to confirm
-The Led is almost on all the time. It goes off for 100 miliseconds every second.
+## Мигание светодиода
+Pico FIDO использует светодиод для отображения текущего статуса. Доступны четыре состояния:
+### Нажмите для подтверждения
+Светодиод горит почти все время. Он выключается на 100 миллисекунд каждую секунду.
 
-![Press to confirm](https://user-images.githubusercontent.com/55573252/162008917-6a730eac-396c-44cc-890e-802294be30a3.gif)
+![Нажмите для подтверждения](https://user-images.githubusercontent.com/55573252/162008917-6a730eac-396c-44cc-890e-802294be30a3.gif)
 
-### Idle mode
-In idle mode, the Pico FIDO goes to sleep. It waits for a command and it is awaken by the driver. The Led is almost off all the time. It goes on for 500 milliseconds every second.
+### Режим ожидания
+В режиме ожидания Pico FIDO засыпает. Он ждёт команду и пробуждается драйвером. Светодиод выключен почти все время. Он включается на 500 миллисекунд каждую секунду.
 
-![Idle mode](https://user-images.githubusercontent.com/55573252/162008980-d5a5caad-072e-400c-98e3-2c606b4b2af9.gif)
+![Режим ожидания](https://user-images.githubusercontent.com/55573252/162008980-d5a5caad-072e-400c-98e3-2c606b4b2af9.gif)
 
-### Active mode
-In active mode, the Pico FIDO is awaken and ready to receive a command. It blinks four times in a second.
+### Активный режим
+В активном режиме Pico FIDO пробужден и готов принимать команды. Он мигает четыре раза в секунду.
 
-![Active](https://user-images.githubusercontent.com/55573252/162008997-1ea8cd7e-5384-4893-9dcb-b473153fc375.gif)
+![Активный](https://user-images.githubusercontent.com/55573252/162008997-1ea8cd7e-5384-4893-9dcb-b473153fc375.gif)
 
-### Processing
-While processing, the Pico FIDO is busy and cannot receive additional commands until the current is processed. In this state, the Led blinks 20 times in a second.
+### Обработка
+Во время обработки Pico FIDO занят и не может принимать дополнительные команды до завершения текущей. В этом состоянии светодиод мигает 20 раз в секунду.
 
-![Processing](https://user-images.githubusercontent.com/55573252/162009007-df45111e-2473-4a92-97c5-15c3cd19babd.gif)
+![Обработка](https://user-images.githubusercontent.com/55573252/162009007-df45111e-2473-4a92-97c5-15c3cd19babd.gif)
 
-## Driver
+## Драйвер
 
-Pico FIDO uses the `HID` driver, which is present in all operating systems. It should be detected by all OS and browser/applications just like normal USB FIDO keys.
+Pico FIDO использует драйвер `HID`, который присутствует во всех операционных системах. Он должен определяться всеми ОС и браузерами/приложениями так же, как и обычные USB FIDO ключи.
 
-## Tests
+## Тесты
 
-Tests can be found in the `tests` folder. They are based on [FIDO2 tests](https://github.com/solokeys/fido2-tests "FIDO2 tests") from Solokeys but adapted to the [python-fido2](https://github.com/Yubico/python-fido2 "python-fido2") v1.0 package, which is a major refactor from the previous 0.8 version and includes the latest improvements from CTAP 2.1.
+Тесты можно найти в папке `tests`. Они основаны на [FIDO2 тестах](https://github.com/solokeys/fido2-tests "FIDO2 tests") от Solokeys, но адаптированы под пакет [python-fido2](https://github.com/Yubico/python-fido2 "python-fido2") v1.0, который является крупным рефакторингом по сравнению с предыдущей версией 0.8 и включает последние улучшения из CTAP 2.1.
 
-To run all tests, use:
+Для запуска всех тестов используйте:
 
 ```sh
 pytest
 ```
 
-To run a subset of tests, use the `-k <test>` flag:
+Для запуска подмножества тестов используйте флаг `-k <test>`:
 
 ```sh
 pytest -k test_credprotect
 ```
 
-## License and Commercial Use
+## Лицензия и коммерческое использование
 
-This project is available under two editions:
+Этот проект доступен в двух редакциях:
 
 **Community Edition (FOSS)**
-- Released under the GNU Affero General Public License v3 (AGPLv3).
-- You are free to study, modify, and run the code, including for internal evaluation.
-- If you distribute modified binaries/firmware, OR if you run a modified version of this project as a network-accessible service, you must provide the corresponding source code to the users of that binary or service, as required by AGPLv3.
-- No warranty. No SLA. No guaranteed support.
+- Выпущен под лицензией GNU Affero General Public License v3 (AGPLv3).
+- Вы свободны изучать, изменять и запускать код, включая для внутренней оценки.
+- Если вы распространяете изменённые бинарные файлы/прошивку ИЛИ запускаете изменённую версию этого проекта как сетевой сервис, вы обязаны предоставить соответствующий исходный код пользователям этого бинарного файла или сервиса, как требуется AGPLv3.
+- Без гарантий. Без SLA. Без гарантированной поддержки.
 
 **Enterprise / Commercial Edition**
-- Proprietary license for organizations that want to:
-  - run this in production with multiple users/devices,
-  - integrate it into their own product/appliance,
-  - enforce corporate policies (PIN policy, admin/user roles, revocation),
-  - deploy it as an internal virtualized / cloud-style service,
-  - and *not* be required to publish derivative source code.
-- Base package includes:
-  - commercial license (no AGPLv3 disclosure obligation for your modifications / integration)
-  - onboarding call
-  - access to officially signed builds
-- Optional / on-demand enterprise components that can be added case-by-case:
-  - ability to operate in multi-user / multi-device environments
-  - device inventory, traceability and secure revocation/offboarding
-  - custom attestation, per-organization device identity / anti-cloning
-  - virtualization / internal "HSM or auth backend" service for multiple teams or tenants
-  - post-quantum (PQC) key material handling and secure PQC credential storage
-  - hierarchical deterministic key derivation (HD wallet–style key trees for per-user / per-tenant keys, firmware signing trees, etc.)
-  - cryptographically signed audit trail / tamper-evident logging
-  - dual-control / two-person approval for high-risk operations
-  - secure key escrow / disaster recovery strategy
-  - release-signing / supply-chain hardening toolchain
-  - policy-locked hardened mode ("FIPS-style profile")
-  - priority security-response SLA
-  - white-label demo / pre-sales bundle
+- Проприетарная лицензия для организаций, которые хотят:
+  - запускать это в продакшене с несколькими пользователями/устройствами,
+  - интегрировать это в собственный продукт/устройство,
+  - применять корпоративные политики (политика PIN, роли администратора/пользователя, отзыв),
+  - развернуть это как внутренний виртуализированный/cloud-сервис,
+  - и *не* быть обязанным публиковать производный исходный код.
+- Базовый пакет включает:
+  - коммерческую лицензию (без обязательств по раскрытию AGPLv3 для ваших изменений/интеграции)
+  - вводный звонок
+  - доступ к официально подписанным сборкам
+- Опциональные/по требованию корпоративные компоненты, которые могут быть добавлены индивидуально:
+  - возможность работы в средах с несколькими пользователями/устройствами
+  - инвентаризация устройств, прослеживаемость и безопасный отзыв/отключение
+  - пользовательская аттестация, идентификация устройства для каждой организации / антиклонирование
+  - виртуализация / внутренний "HSM или бэкенд аутентификации" для нескольких команд или арендаторов
+  - обработка постквантового (PQC) ключевого материала и безопасное хранение PQC-учётных данных
+  - иерархическое детерминированное derivation ключей (ключевые деревья в стиле HD-кошельков для ключей по пользователям/арендаторам, деревья подписи прошивки и т.д.)
+  - криптографически подписанный аудит-трейл / логирование, обнаруживающее подделку
+  - двухконтрольное / двухстороннее согласование для высокорисковых операций
+  - безопасное хранение ключей / стратегия аварийного восстановления
+  - инструментарий для подписи релизов / укрепления цепочки поставок
+  - заблокированный политикой укреплённый режим ("профиль в стиле FIPS")
+  - приоритетный SLA по реагированию на проблемы безопасности
+  - white-label демо / pre-sales пакет
 
-Typical licensing models:
-- Internal use (single legal entity, including internal private cloud / virtualized deployments).
-- OEM / Redistribution / Service (ship in your product OR offer it as a service to third parties).
+Типовые модели лицензирования:
+- Внутреннее использование (одно юридическое лицо, включая внутреннее приватное облако/виртуализированные развертывания).
+- OEM / Перераспределение / Сервис (встраивание в ваш продукт ИЛИ предоставление как сервиса третьим сторонам).
 
-These options are scoped and priced individually depending on which components you actually need.
+Эти варианты ограничены и ценятся индивидуально в зависимости от того, какие компоненты вам действительно нужны.
 
-For commercial licensing and enterprise features, email pol@henarejos.me
-Subject: `ENTERPRISE LICENSE <your company name>`
+Для коммерческого лицензирования и корпоративных функций пишите на pol@henarejos.me
+Тема: `ENTERPRISE LICENSE <название вашей компании>`
 
-See `ENTERPRISE.md` for details.
+Подробности см. в `ENTERPRISE.md`.
 
-## Credits
-Pico FIDO uses the following libraries or portion of code:
-- MbedTLS for cryptographic operations.
-- TinyUSB for low level USB procedures.
-- TinyCBOR for CBOR parsing and formatting.
+## Благодарности
+Pico FIDO использует следующие библиотеки или части кода:
+- MbedTLS для криптографических операций.
+- TinyUSB для низкоуровневых USB процедур.
+- TinyCBOR для парсинга и форматирования CBOR.
