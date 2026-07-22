@@ -1,5 +1,7 @@
 # Pico FIDO — ESP32-S3
 
+![Pico FIDO ESP32-S3](docs/images/yubikey_esp32-s3.png)
+
 FIDO2/CTAP2 аутентификатор на базе ESP32-S3. Работает как USB Passkey для аутентификации в браузерах и приложениях.
 
 ## Возможности
