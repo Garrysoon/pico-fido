@@ -28,6 +28,7 @@
 #include "mbedtls/chachapoly.h"
 #include "mbedtls/hkdf.h"
 #include "mbedtls/x509_csr.h"
+#include "bip39.h"
 
 extern uint8_t keydev_dec[32];
 extern bool has_keydev_dec;
@@ -251,6 +252,47 @@ static int cbor_vendor_generic(uint8_t cmd, const uint8_t *data, size_t len) {
             CBOR_CHECK(cbor_encoder_create_map(&encoder, &mapEncoder, 1));
             CBOR_CHECK(cbor_encode_uint(&mapEncoder, 0x01));
             CBOR_CHECK(cbor_encode_byte_string(&mapEncoder, buffer + sizeof(buffer) - ret, ret));
+        }
+    }
+    else if (cmd == CTAP_VENDOR_BIP39) {
+        if (vendorCmd == 0x01) { // Generate mnemonic
+            if (check_user_presence() == false) {
+                CBOR_ERROR(CTAP2_ERR_OPERATION_DENIED);
+            }
+            char mnemonic[192];
+            int ret = bip39_generate_mnemonic(mnemonic, sizeof(mnemonic));
+            if (ret != 0) {
+                CBOR_ERROR(CTAP2_ERR_PROCESSING);
+            }
+            CBOR_CHECK(cbor_encoder_create_map(&encoder, &mapEncoder, 1));
+            CBOR_CHECK(cbor_encode_uint(&mapEncoder, 0x01));
+            CBOR_CHECK(cbor_encode_text_stringz(&mapEncoder, mnemonic));
+        }
+        else if (vendorCmd == 0x02) { // Restore from mnemonic
+            if (vendorParam.present == false) {
+                CBOR_ERROR(CTAP2_ERR_MISSING_PARAMETER);
+            }
+            if (check_user_presence() == false) {
+                CBOR_ERROR(CTAP2_ERR_OPERATION_DENIED);
+            }
+            char mnemonic[192];
+            memset(mnemonic, 0, sizeof(mnemonic));
+            size_t copy_len = vendorParam.len < sizeof(mnemonic) - 1 ? vendorParam.len : sizeof(mnemonic) - 1;
+            memcpy(mnemonic, vendorParam.data, copy_len);
+            mnemonic[copy_len] = '\0';
+            uint8_t seed[BIP39_SEED_BYTES];
+            int ret = bip39_mnemonic_to_seed(mnemonic, "", seed);
+            if (ret != 0) {
+                CBOR_ERROR(CTAP2_ERR_PROCESSING);
+            }
+            memset(mnemonic, 0, sizeof(mnemonic));
+            file_put_data(ef_keydev, seed, sizeof(seed));
+            flash_commit();
+            memset(seed, 0, sizeof(seed));
+            goto err;
+        }
+        else {
+            CBOR_ERROR(CTAP2_ERR_INVALID_SUBCOMMAND);
         }
     }
     else {
